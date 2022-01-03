@@ -37,11 +37,13 @@ public class MainWindow extends JFrame {
         SwingUtilities.invokeLater(() -> fileChooser = new JFileChooser());
 
     }
+
+    /** Create left-side panel which contains our brushes and tools. */
     private JScrollPane createBrushPanel() {
 
         JPanel brushPanel = new JPanel();
         brushPanel.setLayout(new BoxLayout(brushPanel, BoxLayout.Y_AXIS));
-
+        // Brushes
         addLabelTo(brushPanel, "Brush Types");
         addButtonTo(brushPanel, "Rectangle", e -> mainPnl.setTool(Tool.BRUSH_RECTANGLE));
         addButtonTo(brushPanel, "Round-Rect", e -> mainPnl.setTool(Tool.BRUSH_ROUND_RECT));
@@ -51,24 +53,22 @@ public class MainWindow extends JFrame {
         fill.setSelected(true);
         fill.addActionListener(e -> mainPnl.makeBrushSolid(fill.isSelected()));
         brushPanel.add(fill);
-
+        // Tools
         brushPanel.add(new JSeparator());
         addLabelTo(brushPanel, "Tools");
         addButtonTo(brushPanel, "Eraser", e -> mainPnl.setTool(Tool.ERASER));
         addButtonTo(brushPanel, "Picker", e -> mainPnl.setTool(Tool.COLOR_PICKER));
 
         brushPanel.add(new JSeparator());
-        addButtonTo(
-                brushPanel,
-                "<html>Choose<br>Color</html>",
+        addButtonTo(brushPanel, "Set Color",
                 e -> mainPnl.setBrushFillColor(JColorChooser.showDialog(
-                        mainPnl, "New color", mainPnl.brushFillColor()))
-        );
+                        mainPnl, "New color", mainPnl.brushFillColor())));
 
         return new JScrollPane(brushPanel);
 
     }
 
+    /** Create right-side panel which contains functions like clear resize and export. */
     private JScrollPane createSidePanel() {
 
         JPanel sidePanel = new JPanel();
