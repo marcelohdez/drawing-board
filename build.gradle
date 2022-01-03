@@ -1,0 +1,20 @@
+plugins {
+    id 'application'
+}
+
+group 'me.soggysandwich'
+version '0.1'
+
+repositories {
+    mavenCentral()
+}
+
+application {
+    mainClass = 'me.soggysandwich.drawingBoard.DrawingBoardApp'
+}
+
+jar {
+    manifest {
+    attributes "Main-Class": 'me.soggysandwich.drawingBoard.DrawingBoardApp'
+    }
+}
