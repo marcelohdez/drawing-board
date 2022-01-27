@@ -21,7 +21,7 @@ public class MainWindow extends JFrame {
 
     public MainWindow() {
 
-        setTitle("Drawing Board v0.1");
+        setTitle("Drawing Board v0.2-dev");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         JScrollPane scrollPane = new JScrollPane(mainPnl);
