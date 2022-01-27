@@ -7,14 +7,10 @@ import javax.swing.*;
 public class DrawingBoardApp {
 
     public static void main(String[] args) {
-        try { // Try to set system's look and feel
+        try { // Set the system look and feel, if it is not available the cross-platform one will be used
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
-            try { // If not available, try to set the cross-platform look and feel
-                UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-            } catch (Exception ex) { // Finally, if that fails then print the error.
-                ex.printStackTrace();
-            }
+            e.printStackTrace();
         }
 
         new MainWindow();
