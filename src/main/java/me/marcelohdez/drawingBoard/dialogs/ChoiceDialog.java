@@ -1,4 +1,4 @@
-package me.soggysandwich.drawingBoard.dialogs;
+package me.marcelohdez.drawingBoard.dialogs;
 
 import javax.swing.*;
 import java.awt.*;

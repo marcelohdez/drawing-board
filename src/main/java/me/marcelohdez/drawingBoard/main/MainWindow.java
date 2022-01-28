@@ -1,7 +1,7 @@
-package me.soggysandwich.drawingBoard.main;
+package me.marcelohdez.drawingBoard.main;
 
-import me.soggysandwich.drawingBoard.dialogs.ChoiceDialog;
-import me.soggysandwich.drawingBoard.dialogs.ResizeDialog;
+import me.marcelohdez.drawingBoard.dialogs.ChoiceDialog;
+import me.marcelohdez.drawingBoard.dialogs.ResizeDialog;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

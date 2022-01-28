@@ -1,4 +1,4 @@
-package me.soggysandwich.drawingBoard.main;
+package me.marcelohdez.drawingBoard.main;
 
 import javax.swing.*;
 import java.awt.*;

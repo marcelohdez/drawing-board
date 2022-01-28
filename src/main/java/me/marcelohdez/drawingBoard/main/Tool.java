@@ -1,4 +1,4 @@
-package me.soggysandwich.drawingBoard.main;
+package me.marcelohdez.drawingBoard.main;
 
 public enum Tool {
     BRUSH_RECTANGLE,

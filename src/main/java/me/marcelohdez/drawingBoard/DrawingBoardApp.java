@@ -1,6 +1,6 @@
-package me.soggysandwich.drawingBoard;
+package me.marcelohdez.drawingBoard;
 
-import me.soggysandwich.drawingBoard.main.MainWindow;
+import me.marcelohdez.drawingBoard.main.MainWindow;
 
 import javax.swing.*;
 
