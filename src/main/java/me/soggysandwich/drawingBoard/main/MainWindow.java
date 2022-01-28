@@ -8,16 +8,21 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Objects;
 
-public class MainWindow extends JFrame {
+public class MainWindow extends JFrame implements KeyListener {
 
-    DrawingPanel mainPnl = new DrawingPanel(600, 600);
+    DrawingPanel mainPnl = new DrawingPanel(this, 600, 600);
     JFileChooser fileChooser; // For exporting our images
+
+    // Action keys
+    private boolean isShifting, isHoldingCtrl;
 
     public MainWindow() {
 
@@ -87,6 +92,7 @@ public class MainWindow extends JFrame {
 
     private void addButtonTo(JPanel to, String text, ActionListener al) {
         JButton button = new JButton(text);
+        button.addKeyListener(this);
         button.addActionListener(al);
         button.setMargin(new Insets(20, 10, 20, 10));
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -138,5 +144,53 @@ public class MainWindow extends JFrame {
             return new File(f.getPath() + extension);
         } else return f;
     }
+
+    protected boolean isShifting() {
+        return isShifting;
+    }
+
+    protected boolean isHoldingCtrl() {
+        return isHoldingCtrl;
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        switch (e.getKeyCode()) {
+            // ======== Action keys ========
+            case KeyEvent.VK_SHIFT -> {
+                if (isHoldingCtrl) isHoldingCtrl = false; // User must use one or the other for shortcuts
+                isShifting = true;
+            }
+            // Command (meta) on macOS will be considered as ctrl for our shortcuts
+            case KeyEvent.VK_CONTROL, KeyEvent.VK_META -> {
+                if (isShifting) isShifting = false; // User must use one or the other for shortcuts
+                isHoldingCtrl = true;
+            }
+            // ======== Regular keys ========
+            case KeyEvent.VK_UP -> { // Increase brush size
+                if (isHoldingCtrl) {
+                    mainPnl.changeBrushSizeBy((int) (mainPnl.brushSize() * 0.1));
+                } else if (isShifting) mainPnl.changeBrushSizeBy(1);
+            }
+            case KeyEvent.VK_DOWN -> { // Decrease brush size
+                if (isHoldingCtrl) {
+                    mainPnl.changeBrushSizeBy((int) -(mainPnl.brushSize() * 0.1));
+                } else if (isShifting) mainPnl.changeBrushSizeBy(-1);
+            }
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        // Disable action key values
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_SHIFT -> isShifting = false;
+            // Command (meta) on macOS will be considered as ctrl for our shortcuts
+            case KeyEvent.VK_CONTROL, KeyEvent.VK_META -> isHoldingCtrl = false;
+        }
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {}
 
 }

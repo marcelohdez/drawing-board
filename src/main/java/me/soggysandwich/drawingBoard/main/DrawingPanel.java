@@ -9,6 +9,8 @@ import java.awt.image.BufferedImage;
 
 public class DrawingPanel extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener {
 
+    private final MainWindow parent;
+
     // Canvas data
     private BufferedImage canvas; // Current, to draw on
     private int canvasX;
@@ -26,7 +28,9 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
     int lastCursorY = -brushSize;
     final int PICKER_SIZE = 60; // Size of color picker window
 
-    public DrawingPanel(int width, int height) {
+    public DrawingPanel(MainWindow parent, int width, int height) {
+        this.parent = parent;
+
         addMouseListener(this);
         addMouseMotionListener(this);
         addMouseWheelListener(this);
@@ -71,7 +75,7 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
         repaint();
     }
 
-    public void changeBrushSize(int amount) {
+    public void changeBrushSizeBy(int amount) {
         brushSize += amount;
         repaint();
     }
@@ -98,6 +102,10 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 
     public BufferedImage getCanvas() {
         return canvas;
+    }
+
+    public int brushSize() {
+        return brushSize;
     }
 
     private void drawAt(int x, int y) {
@@ -202,17 +210,17 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        if (e.isControlDown() || e.isMetaDown()) {
+        if (parent.isHoldingCtrl()) {
             if (e.getWheelRotation() < 0) {
-                changeBrushSize((int) (brushSize * 0.1)); // Increase size proportionately
+                changeBrushSizeBy((int) (brushSize * 0.1));
             } else {
-                changeBrushSize((int) -(brushSize * 0.1)); // Decrease size proportionately
+                changeBrushSizeBy((int) -(brushSize * 0.1));
             }
-        } else if (e.isShiftDown()) {
+        } else if (parent.isShifting()) {
             if (e.getWheelRotation() < 0) {
-                changeBrushSize(1); // Increase size
+                changeBrushSizeBy(1);
             } else {
-                changeBrushSize(-1); // Decrease size
+                changeBrushSizeBy(-1);
             }
         }
     }
