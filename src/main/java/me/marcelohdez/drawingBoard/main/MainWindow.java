@@ -26,7 +26,7 @@ public class MainWindow extends JFrame implements KeyListener {
 
     public MainWindow() {
 
-        setTitle("Drawing Board v0.2-dev");
+        setTitle("Drawing Board v0.1-dev");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         JScrollPane scrollPane = new JScrollPane(mainPnl);

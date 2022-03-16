@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'me.marcelohdez'
-version '0.2-dev'
+version '0.1-dev'
 
 repositories {
     mavenCentral()
