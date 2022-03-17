@@ -25,27 +25,24 @@ public class MainWindow extends JFrame implements KeyListener {
     private boolean isShifting, isHoldingCtrl;
 
     public MainWindow() {
-
         setTitle("Drawing Board v0.1-dev");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        JScrollPane scrollPane = new JScrollPane(mainPnl);
-        add(createBrushPanel(), BorderLayout.WEST);
-        add(scrollPane, BorderLayout.CENTER);
-        add(createSidePanel(), BorderLayout.EAST);
+        // Create UI:
+        add(createToolsPanel(), BorderLayout.WEST);
+        add(new JScrollPane(mainPnl), BorderLayout.CENTER);
+        add(createCanvasPanel(), BorderLayout.EAST);
 
         pack();
-        setMinimumSize(new Dimension((int) (getWidth() * 0.7), (int) (getHeight() * 0.7)));
+        setMinimumSize(new Dimension((int) (getWidth() * 0.7), (int) (getHeight() * 0.7))); // Allow window to be shrunken a bit
         setLocationRelativeTo(null);
         setVisible(true);
 
         SwingUtilities.invokeLater(() -> fileChooser = new JFileChooser());
-
     }
 
     /** Create left-side panel which contains our brushes and tools. */
-    private JScrollPane createBrushPanel() {
-
+    private JScrollPane createToolsPanel() {
         JPanel brushPanel = new JPanel();
         brushPanel.setLayout(new BoxLayout(brushPanel, BoxLayout.Y_AXIS));
         // Brushes
@@ -70,12 +67,10 @@ public class MainWindow extends JFrame implements KeyListener {
                         mainPnl, "New color", mainPnl.brushFillColor())));
 
         return new JScrollPane(brushPanel);
-
     }
 
     /** Create right-side panel which contains functions like clear resize and export. */
-    private JScrollPane createSidePanel() {
-
+    private JScrollPane createCanvasPanel() {
         JPanel sidePanel = new JPanel();
         sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.Y_AXIS));
 
@@ -87,7 +82,6 @@ public class MainWindow extends JFrame implements KeyListener {
         addButtonTo(sidePanel, "Export", e -> exportCanvas());
 
         return new JScrollPane(sidePanel);
-
     }
 
     private void addButtonTo(JPanel to, String text, ActionListener al) {

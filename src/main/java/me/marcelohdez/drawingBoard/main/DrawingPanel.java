@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
 
 public class DrawingPanel extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener {
 
-    private final MainWindow parent;
+    private final MainWindow parent; // Used to check if user is shifting/holding ctrl
 
     // Canvas data
     private BufferedImage canvas; // Current, to draw on
@@ -18,7 +18,7 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 
     // Brush data
     private int brushSize = 40;
-    private boolean brushSolid = true;
+    private boolean brushIsSolid = true;
     private Color brushFill = Color.BLACK;
     private Tool currentTool = Tool.BRUSH_CIRCLE;
     private Tool lastTool = currentTool; // For switching between picker and back
@@ -31,26 +31,29 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
     public DrawingPanel(MainWindow parent, int width, int height) {
         this.parent = parent;
 
+        // Add mouse listeners for drawing
         addMouseListener(this);
         addMouseMotionListener(this);
         addMouseWheelListener(this);
 
-        setPreferredSize(new Dimension(width, height));
+        setPreferredSize(new Dimension(width, height)); // Does not allow this component to shrink when calling pack()
         canvas = createCanvas(width, height);
     }
 
     @Override
     public void paintComponent(Graphics gr) {
-        super.paintComponent(gr);
+        super.paintComponent(gr); // Run JPanel's default paintComponent method which clears the screen etc
         Graphics2D g = (Graphics2D) gr;
 
+        // Get the top left point of the canvas once it is centered:
         canvasX = (getWidth() / 2) - (canvas.getWidth() / 2);
         canvasY = (getHeight() / 2) - (canvas.getHeight() / 2);
 
-        g.drawImage(canvas, canvasX, canvasY, this);
-        g.drawRect(canvasX - 1, canvasY - 1, canvas.getWidth() + 1, canvas.getHeight() + 1);
-        g.setColor(Color.GRAY);
+        g.drawImage(canvas, canvasX, canvasY, this); // Draw our current image
+        g.drawRect(canvasX - 1, canvasY - 1, canvas.getWidth() + 1, canvas.getHeight() + 1); // Outline
 
+        // Draw outline of current tool:
+        g.setColor(Color.GRAY);
         if (currentTool == Tool.COLOR_PICKER) {
             g.drawRect(lastCursorX + 4, lastCursorY - PICKER_SIZE - 6, PICKER_SIZE + 1, PICKER_SIZE + 1);
             g.setColor(pickColorAt(lastCursorX - canvasX, lastCursorY - canvasY));
@@ -81,7 +84,7 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
     }
 
     public void makeBrushSolid(boolean b) {
-        brushSolid = b;
+        brushIsSolid = b;
     }
 
     public void setBrushFillColor(Color color) {
@@ -118,14 +121,13 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
             g.clearRect(x - brushSize / 2, y - brushSize / 2, brushSize, brushSize);
         } else if (currentTool != Tool.COLOR_PICKER) {
             g.setColor(brushFill);
-            if (brushSolid) {
+            if (brushIsSolid) {
                 g.fill(getChosenShape(x, y));
             } else g.draw(getChosenShape(x, y));
         }
 
         g.dispose();
         repaintCursorArea();
-        //repaint(canvasX, canvasY, canvas.getWidth(), canvas.getHeight()); // Redraw canvas only
     }
 
     private BufferedImage createCanvas(int w, int h) {
@@ -151,13 +153,15 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
                 return new Ellipse2D.Float(x - brushSize / 2f, y - brushSize / 2f, brushSize, brushSize);
             }
             case BRUSH_ROUND_RECT -> {
+                final float ARC_RADIUS = 24;
+
                 return new RoundRectangle2D.Float(
                         x - brushSize / 2f,
                         y - brushSize / 2f,
                         brushSize,
                         brushSize,
-                        24f,
-                        24f
+                        ARC_RADIUS,
+                        ARC_RADIUS
                 );
             }
             default -> {
@@ -167,19 +171,23 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
     }
 
     private void repaintCursorArea() {
+        // Extra spacing to paint to not leave trails when moving cursor
+        final int PICKER_BOX_BUFFER = 6;
+        final int BRUSH_AREA_BUFFER = 3;
+
         if (currentTool == Tool.COLOR_PICKER) {
             repaint(
                     lastCursorX + 2,
                     lastCursorY - PICKER_SIZE - 8,
-                    PICKER_SIZE + 6,
-                    PICKER_SIZE + 6
+                    PICKER_SIZE + PICKER_BOX_BUFFER,
+                    PICKER_SIZE + PICKER_BOX_BUFFER
             );
         } else {
             repaint(
-                    lastCursorX - brushSize / 2 - 1,
-                    lastCursorY - brushSize / 2 - 1,
-                    brushSize + 3,
-                    brushSize + 3
+                    lastCursorX - 1 - brushSize / 2,
+                    lastCursorY - 1 - brushSize / 2,
+                    brushSize + BRUSH_AREA_BUFFER,
+                    brushSize + BRUSH_AREA_BUFFER
             );
         }
     }
@@ -210,18 +218,14 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        if (parent.isHoldingCtrl()) {
-            if (e.getWheelRotation() < 0) {
-                changeBrushSizeBy((int) (brushSize * 0.1));
-            } else {
-                changeBrushSizeBy((int) -(brushSize * 0.1));
-            }
-        } else if (parent.isShifting()) {
-            if (e.getWheelRotation() < 0) {
-                changeBrushSizeBy(1);
-            } else {
-                changeBrushSizeBy(-1);
-            }
+        // e.getWheelRotation is -1 when scrolling up, and 1 when scrolling down,
+        // so here we flip it to make it more readable
+        int scrollDir = -(e.getWheelRotation());
+
+        if (parent.isHoldingCtrl()) { // Change size by 10%
+            changeBrushSizeBy((int) (scrollDir * (brushSize * 0.1)));
+        } else if (parent.isShifting()) { // Change size by 1 point
+            changeBrushSizeBy(scrollDir);
         }
     }
 
